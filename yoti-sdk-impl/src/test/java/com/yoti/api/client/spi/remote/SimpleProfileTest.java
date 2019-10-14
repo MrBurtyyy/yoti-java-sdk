@@ -1,16 +1,11 @@
 package com.yoti.api.client.spi.remote;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.yoti.api.client.Attribute;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
-
-import com.yoti.api.client.Attribute;
-
-import org.junit.Test;
 
 public class SimpleProfileTest {
 
@@ -35,7 +30,7 @@ public class SimpleProfileTest {
     public void getAttribute_shouldReturnNullValueForNonExistingKey() {
         SimpleProfile profile = new SimpleProfile(Collections.<Attribute<?>>emptyList());
 
-        assertNull(profile.getAttribute(SOME_KEY));
+        Assert.assertNull(profile.getAttribute(SOME_KEY));
     }
 
     @Test
@@ -44,7 +39,7 @@ public class SimpleProfileTest {
 
         Attribute result = profile.getAttribute(SOME_KEY);
 
-        assertEquals(STRING_VALUE, result.getValue());
+        Assert.assertEquals(STRING_VALUE, result.getValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -58,7 +53,7 @@ public class SimpleProfileTest {
     public void getAttributeTyped_shouldReturnNullValueForNonExistingKey() {
         SimpleProfile profile = new SimpleProfile(Collections.<Attribute<?>>emptyList());
 
-        assertNull(profile.getAttribute(SOME_KEY, Object.class));
+        Assert.assertNull(profile.getAttribute(SOME_KEY, Object.class));
     }
 
     @Test
@@ -67,7 +62,7 @@ public class SimpleProfileTest {
 
         Attribute<String> result = profile.getAttribute(SOME_KEY, String.class);
 
-        assertEquals(STRING_VALUE, result.getValue());
+        Assert.assertEquals(STRING_VALUE, result.getValue());
     }
 
     @Test
@@ -77,11 +72,11 @@ public class SimpleProfileTest {
         try {
             profile.getAttribute(SOME_KEY, String.class);
         } catch (ClassCastException e) {
-            assertTrue(e.getMessage().contains("java.lang.String"));
-            assertTrue(e.getMessage().contains("java.lang.Integer"));
+            Assert.assertTrue(e.getMessage().contains("java.lang.String"));
+            Assert.assertTrue(e.getMessage().contains("java.lang.Integer"));
             return;
         }
-        fail("Expected an exception");
+        Assert.fail("Expected an exception");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -97,7 +92,7 @@ public class SimpleProfileTest {
 
         List<Attribute<Integer>> result = profile.findAttributesStartingWith(STARTS_WITH, Integer.class);
 
-        assertTrue(result.isEmpty());
+        Assert.assertTrue(result.isEmpty());
     }
 
     @Test
@@ -107,12 +102,12 @@ public class SimpleProfileTest {
         try {
             profile.findAttributesStartingWith(STARTS_WITH, String.class);
         } catch (ClassCastException e) {
-            assertTrue(e.getMessage().contains("java.lang.String"));
-            assertTrue(e.getMessage().contains("java.lang.Integer"));
+            Assert.assertTrue(e.getMessage().contains("java.lang.String"));
+            Assert.assertTrue(e.getMessage().contains("java.lang.Integer"));
             return;
         }
 
-        fail("Expected an exception");
+        Assert.fail("Expected an exception");
     }
 
     @Test
@@ -121,8 +116,8 @@ public class SimpleProfileTest {
 
         List<Attribute<Integer>> result = profile.findAttributesStartingWith(STARTS_WITH, Integer.class);
 
-        assertEquals(result.size(), 1);
-        assertEquals(INTEGER_VALUE, result.get(0).getValue());
+        Assert.assertEquals(result.size(), 1);
+        Assert.assertEquals(INTEGER_VALUE, result.get(0).getValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -138,7 +133,7 @@ public class SimpleProfileTest {
 
         Attribute<Integer> result = profile.findAttributeStartingWith(STARTS_WITH, Integer.class);
 
-        assertNull(result);
+        Assert.assertNull(result);
     }
 
     @Test
@@ -148,12 +143,12 @@ public class SimpleProfileTest {
         try {
             profile.findAttributeStartingWith(STARTS_WITH, String.class);
         } catch (ClassCastException e) {
-            assertTrue(e.getMessage().contains("java.lang.String"));
-            assertTrue(e.getMessage().contains("java.lang.Integer"));
+            Assert.assertTrue(e.getMessage().contains("java.lang.String"));
+            Assert.assertTrue(e.getMessage().contains("java.lang.Integer"));
             return;
         }
 
-        fail("Expected an exception");
+        Assert.fail("Expected an exception");
     }
 
     @Test
@@ -162,7 +157,7 @@ public class SimpleProfileTest {
 
         Attribute<Integer> result = profile.findAttributeStartingWith(STARTS_WITH, Integer.class);
 
-        assertEquals(INTEGER_VALUE, result.getValue());
+        Assert.assertEquals(INTEGER_VALUE, result.getValue());
     }
 
     private static <T> List<Attribute<?>> asAttributeList(String key, T o) {
