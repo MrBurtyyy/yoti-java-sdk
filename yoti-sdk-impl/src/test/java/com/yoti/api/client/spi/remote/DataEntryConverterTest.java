@@ -49,7 +49,7 @@ public class DataEntryConverterTest {
         try {
             dataEntryConverter.convertDataEntry(dataEntryMock);
         } catch (ExtraDataException e) {
-            assertThat(e.getMessage(), containsString("Unsupported data entry"));
+            assertThat(e.getMessage(), containsString("Unsupported/invalid data entry"));
             return;
         }
         fail("Expected ExtraDataException");

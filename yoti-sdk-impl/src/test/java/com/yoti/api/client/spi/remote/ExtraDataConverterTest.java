@@ -22,6 +22,7 @@ import static com.yoti.api.client.spi.remote.proto.DataEntryProto.DataEntry.Type
 import static com.yoti.api.client.spi.remote.util.ProtoUtil.*;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -115,6 +116,20 @@ public class ExtraDataConverterTest {
         assertNotNull(attributeIssuanceDetails);
         assertEquals(attributeIssuanceDetails.getToken(), "someValue");
         assertNotEquals(attributeIssuanceDetails.getToken(), "someOtherToken");
+    }
+
+    @Test
+    public void shouldReturnNullForAttributeIssuanceDetailsWhenThirdPartyAttributeTokenIsMissing() throws Exception {
+        ThirdPartyAttributeProto.ThirdPartyAttribute thirdPartyAttribute = buildThirdPartyAttribute("", null);
+        DataEntryProto.DataEntry dataEntry = buildDataEntry(THIRD_PARTY_ATTRIBUTE, thirdPartyAttribute.toByteString());
+        byte[] extraDataBytes = buildExtraData(dataEntry).toByteArray();
+
+        when(dataEntryConverterMock.convertDataEntry(eq(dataEntry))).thenThrow(new ExtraDataException("Error"));
+
+        ExtraData extraData = extraDataConverter.read(extraDataBytes);
+        AttributeIssuanceDetails attributeIssuanceDetails = extraData.getAttributeIssuanceDetails();
+
+        assertNull(attributeIssuanceDetails);
     }
 
     private static byte[] createExtraData(DataEntryProto.DataEntry... dataEntries) {

@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.yoti.api.client.DateTime;
 import com.yoti.api.client.AttributeIssuanceDetails;
 import com.yoti.api.client.AttributeDefinition;
+import com.yoti.api.client.ExtraDataException;
 import com.yoti.api.client.spi.remote.proto.IssuingAttributesProto;
 import com.yoti.api.client.spi.remote.proto.ThirdPartyAttributeProto;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class ThirdPartyAttributeConverter {
         return new ThirdPartyAttributeConverter();
     }
 
-    public AttributeIssuanceDetails parseThirdPartyAttribute(byte[] value) throws InvalidProtocolBufferException {
+    public AttributeIssuanceDetails parseThirdPartyAttribute(byte[] value) throws InvalidProtocolBufferException, ExtraDataException {
         ThirdPartyAttributeProto.ThirdPartyAttribute thirdPartyAttribute = ThirdPartyAttributeProto.ThirdPartyAttribute.parseFrom(value);
 
         IssuingAttributes issuingAttributes = parseIssuingAttributes(thirdPartyAttribute.getIssuingAttributes());
@@ -36,7 +37,7 @@ public class ThirdPartyAttributeConverter {
         List<AttributeDefinition> attributeDefinitions = issuingAttributes.getAttributeDefinitions();
 
         if (token == null || token.isEmpty()) {
-            LOG.error("Failed to retrieve token from ThirdPartyAttribute");
+            throw new ExtraDataException("ThirdPartyAttribute missing token");
         }
 
         return new SimpleAttributeIssuanceDetails(token, expiryDate, attributeDefinitions);

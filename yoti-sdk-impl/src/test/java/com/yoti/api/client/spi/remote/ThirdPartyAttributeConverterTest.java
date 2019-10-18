@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.yoti.api.client.AttributeDefinition;
 import com.yoti.api.client.AttributeIssuanceDetails;
 import com.yoti.api.client.DateTime;
+import com.yoti.api.client.ExtraDataException;
 import com.yoti.api.client.spi.remote.proto.IssuingAttributesProto;
 import com.yoti.api.client.spi.remote.proto.ThirdPartyAttributeProto;
 import org.junit.Test;
@@ -65,12 +66,11 @@ public class ThirdPartyAttributeConverterTest {
         assertThat(attributeIssuanceDetails.getIssuingAttributes().get(1).getName(), is("SOME_OTHER_DEFINITION"));
     }
 
-    @Test
-    public void shouldParseThirdPartyAttributeWithoutToken() throws Exception {
+    @Test(expected = ExtraDataException.class)
+    public void shouldThrowExceptionForThirdPartyAttributeWithoutToken() throws Exception {
         byte[] thirdPartyAttribute = buildThirdPartyAttribute("", null).toByteArray();
-        AttributeIssuanceDetails attributeIssuanceDetails = thirdPartyAttributeConverter.parseThirdPartyAttribute(thirdPartyAttribute);
 
-        assertThat(attributeIssuanceDetails.getToken(), is(""));
+        thirdPartyAttributeConverter.parseThirdPartyAttribute(thirdPartyAttribute);
     }
 
     @Test
