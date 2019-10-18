@@ -38,9 +38,6 @@ public class ThirdPartyAttributeConverter {
         if (token == null || token.isEmpty()) {
             LOG.error("Failed to retrieve token from ThirdPartyAttribute");
         }
-        if (expiryDate == null) {
-            LOG.error("Failed to retrieve expiryDate from ThirdPartyAttribute");
-        }
 
         return new SimpleAttributeIssuanceDetails(token, expiryDate, attributeDefinitions);
     }
