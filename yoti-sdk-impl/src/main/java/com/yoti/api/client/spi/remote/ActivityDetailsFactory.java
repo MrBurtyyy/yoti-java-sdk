@@ -7,6 +7,8 @@ import com.yoti.api.client.ExtraData;
 import com.yoti.api.client.ExtraDataException;
 import com.yoti.api.client.spi.remote.call.Receipt;
 import com.yoti.api.client.spi.remote.util.DecryptionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
@@ -21,6 +23,8 @@ import static com.yoti.api.client.spi.remote.call.YotiConstants.*;
 import static com.yoti.api.client.spi.remote.util.Validation.notNull;
 
 class ActivityDetailsFactory {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ActivityDetailsFactory.class);
 
     private final ProfileReader profileReader;
     private final ExtraDataConverter extraDataConverter;
@@ -53,12 +57,13 @@ class ActivityDetailsFactory {
         return new SimpleActivityDetails(rememberMeId, parentRememberMeId, userProfile, applicationProfile, extraData, timestamp, receipt.getReceiptId());
     }
 
-    private ExtraData parseExtraData(byte[] extraDataBytes) throws ProfileException {
+    private ExtraData parseExtraData(byte[] extraDataBytes) {
         ExtraData extraData;
         try {
             extraData = extraDataConverter.read(extraDataBytes);
         } catch (ExtraDataException e) {
-            throw new ProfileException("Failed to load extra data from receipt", e);
+            LOG.error("Failed to parse extra data from receipt");
+            extraData = new SimpleExtraData();
         }
 
         return extraData;
