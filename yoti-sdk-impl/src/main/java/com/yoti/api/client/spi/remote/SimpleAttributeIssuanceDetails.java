@@ -17,7 +17,12 @@ public class SimpleAttributeIssuanceDetails implements AttributeIssuanceDetails 
     private List<AttributeDefinition> issuingAttributes;
 
     public SimpleAttributeIssuanceDetails(String token, DateTime expiryDate, List<AttributeDefinition> issuingAttributes) {
-        this.token = token;
+        if (token == null) {
+            this.token = "";
+        } else {
+            this.token = token;
+        }
+
         this.expiryDate = expiryDate;
         this.issuingAttributes = issuingAttributes;
     }

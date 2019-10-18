@@ -66,6 +66,14 @@ public class ThirdPartyAttributeConverterTest {
     }
 
     @Test
+    public void shouldParseThirdPartyAttributeWithoutToken() throws Exception {
+        byte[] thirdPartyAttribute = buildThirdPartyAttribute("", null).toByteArray();
+        AttributeIssuanceDetails attributeIssuanceDetails = thirdPartyAttributeConverter.parseThirdPartyAttribute(thirdPartyAttribute);
+
+        assertThat(attributeIssuanceDetails.getToken(), is(""));
+    }
+
+    @Test
     public void shouldReturnNullForIncorrectExpiryDateFormat() throws Exception {
         IssuingAttributesProto.IssuingAttributes issuingAttributes = buildIssuingAttributes(SOME_INVALID_FORMAT_EXPIRY_DATE);
 
