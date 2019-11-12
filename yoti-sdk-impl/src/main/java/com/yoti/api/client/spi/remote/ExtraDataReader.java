@@ -23,9 +23,11 @@ public class ExtraDataReader extends EncryptedDataReader {
     @Override
     ExtraData read(byte[] encryptedBytes, Key secretKey) throws ProfileException, ExtraDataException {
         ExtraData extraData = null;
-        if (encryptedBytes != null || encryptedBytes.length > 0) {
+        if (encryptedBytes != null && encryptedBytes.length > 0) {
             byte[] extraDataBytes = decryptBytes(encryptedBytes, secretKey);
             extraData = extraDataConverter.read(extraDataBytes);
+        } else {
+            extraData = new SimpleExtraData();
         }
 
         return extraData;
