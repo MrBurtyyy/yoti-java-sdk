@@ -32,7 +32,7 @@
     </Match>
 
     <Match>
-        <Class name="com.yoti.api.client.spi.remote.ProfileReader"/>
+        <Class name="com.yoti.api.client.spi.remote.EncryptedDataReader"/>
         <Bug pattern="CIPHER_INTEGRITY"/>
     </Match>
 

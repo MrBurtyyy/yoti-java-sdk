@@ -1,5 +1,8 @@
 package com.yoti.api.client.spi.remote;
 
+import static com.yoti.api.client.spi.remote.call.YotiConstants.SYMMETRIC_CIPHER;
+import static javax.crypto.Cipher.DECRYPT_MODE;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.yoti.api.client.ProfileException;
@@ -10,9 +13,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.GeneralSecurityException;
 import java.security.Key;
-
-import static com.yoti.api.client.spi.remote.call.YotiConstants.SYMMETRIC_CIPHER;
-import static javax.crypto.Cipher.DECRYPT_MODE;
 
 public class EncryptedDataReader {
 

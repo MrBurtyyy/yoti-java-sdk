@@ -39,7 +39,7 @@ public class ThirdPartyAttributeConverter {
         DateTime expiryDate = issuingAttributes.getExpiryDate();
         List<AttributeDefinition> attributeDefinitions = issuingAttributes.getAttributeDefinitions();
 
-        if (token == null || token.isEmpty()) {
+        if (token.isEmpty()) {
             throw new ExtraDataException("ThirdPartyAttribute missing token");
         }
 
