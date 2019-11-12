@@ -1,0 +1,35 @@
+{
+  "name": "com.rakuten.id",
+  "mimeType": "text/plain",
+  "subjectMimeType": "text/plain",
+  "config": {
+    "accessProperties": {
+      "requestors": [
+        {
+          "domain": "example.com"
+        },
+        {
+          "domain": "rakuten.com"
+        }
+      ]
+    },
+    "localisationProperties": {
+      "defaultLocalisation": {
+        "locale": "en_GB",
+        "value": "Localhost identifier"
+      }
+    },
+    "issuanceProperties": {
+      "maxCardinality": 1,
+      "issuers": [
+        {
+          "domain": "rakuten.com"
+        }
+      ],
+      "issuanceURL": "https://rakuten.com:8443/get-identifier"
+    },
+    "displayProperties": {
+      "displayValueMimeType": "text/plain"
+    }
+  }
+}

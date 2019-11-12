@@ -66,9 +66,11 @@
             </section>
         </main>
 
-        <script src="https://www.yoti.com/share/client/"></script>
+        <script src="https://stg1.www.internal.yoti.com/share/client"></script>
         <script th:inline="javascript">
           window.Yoti.Share.init({
+            "shareApiUrl": "https://stg1.www.internal.yoti.com/share/api/public/qr/",
+            "shareCdnUrl": "https://stg1.www.internal.yoti.com/share/static",
             "elements": [{
               "domId": "yoti-share-button",
                 "scenarioId": /*[[${scenarioId}]]*/ "",
