@@ -60,9 +60,7 @@ public class ActivityDetailsFactoryTest {
     @InjectMocks ActivityDetailsFactory testObj;
 
     @Mock ProfileReader profileReaderMock;
-
-    @Mock
-    ExtraDataConverter extraDataConverterMock;
+    @Mock ExtraDataReader extraDataReaderMock;
 
     KeyPair keyPair;
     byte[] validReceiptKey;
@@ -140,7 +138,7 @@ public class ActivityDetailsFactoryTest {
                 .build();
         when(profileReaderMock.read(eq(PROFILE_CONTENT), any(Key.class))).thenReturn(profileMock);
         when(profileReaderMock.read(eq(OTHER_PROFILE_CONTENT), any(Key.class))).thenReturn(otherProfileMock);
-        when(extraDataConverterMock.read(eq(EXTRA_DATA_CONTENT))).thenReturn(extraDataMock);
+        when(extraDataReaderMock.read(eq(EXTRA_DATA_CONTENT), any(Key.class))).thenReturn(extraDataMock);
 
 
         ActivityDetails result = testObj.create(receipt, keyPair.getPrivate());
@@ -169,7 +167,7 @@ public class ActivityDetailsFactoryTest {
                 .build();
         when(profileReaderMock.read(eq(PROFILE_CONTENT), any(Key.class))).thenReturn(profileMock);
         when(profileReaderMock.read(eq(OTHER_PROFILE_CONTENT), any(Key.class))).thenReturn(otherProfileMock);
-        when(extraDataConverterMock.read(eq(EXTRA_DATA_CONTENT))).thenReturn(extraDataMock);
+        when(extraDataReaderMock.read(eq(EXTRA_DATA_CONTENT), any(Key.class))).thenReturn(extraDataMock);
 
         ActivityDetails result = testObj.create(receipt, keyPair.getPrivate());
 
@@ -197,7 +195,7 @@ public class ActivityDetailsFactoryTest {
                 .build();
         when(profileReaderMock.read(eq(PROFILE_CONTENT), any(Key.class))).thenReturn(profileMock);
         when(profileReaderMock.read(eq(OTHER_PROFILE_CONTENT), any(Key.class))).thenReturn(otherProfileMock);
-        when(extraDataConverterMock.read(EXTRA_DATA_CONTENT)).thenReturn(extraDataMock);
+        when(extraDataReaderMock.read(eq(EXTRA_DATA_CONTENT), any(Key.class))).thenReturn(extraDataMock);
 
         ActivityDetails result = testObj.create(receipt, keyPair.getPrivate());
 

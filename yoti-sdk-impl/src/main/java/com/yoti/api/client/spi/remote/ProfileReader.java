@@ -8,23 +8,28 @@ import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
-class ProfileReader extends EncryptedDataReader {
+class ProfileReader {
 
+    private final EncryptedDataReader encryptedDataReader;
     private final AttributeListConverter attributeListConverter;
 
-    private ProfileReader(AttributeListConverter attributeListConverter) {
+    private ProfileReader(EncryptedDataReader encryptedDataReader,
+                          AttributeListConverter attributeListConverter) {
+        this.encryptedDataReader = encryptedDataReader;
         this.attributeListConverter = attributeListConverter;
     }
 
     static ProfileReader newInstance() {
-        return new ProfileReader(AttributeListConverter.newInstance());
+        return new ProfileReader(
+                new EncryptedDataReader(),
+                AttributeListConverter.newInstance()
+        );
     }
 
-    @Override
     Profile read(byte[] encryptedProfileBytes, Key secretKey) throws ProfileException {
         List<Attribute<?>> attributeList = new ArrayList<>();
         if (encryptedProfileBytes != null && encryptedProfileBytes.length > 0) {
-            byte[] profileData = decryptBytes(encryptedProfileBytes, secretKey);
+            byte[] profileData = encryptedDataReader.decryptBytes(encryptedProfileBytes, secretKey);
             attributeList = attributeListConverter.parseAttributeList(profileData);
         }
         return new SimpleProfile(attributeList);

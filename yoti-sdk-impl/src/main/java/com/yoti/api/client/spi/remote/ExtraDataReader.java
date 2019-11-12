@@ -6,25 +6,29 @@ import com.yoti.api.client.ProfileException;
 
 import java.security.Key;
 
-public class ExtraDataReader extends EncryptedDataReader {
+public class ExtraDataReader {
 
+    private final EncryptedDataReader encryptedDataReader;
     private final ExtraDataConverter extraDataConverter;
 
-    private ExtraDataReader(ExtraDataConverter extraDataConverter) {
+    private ExtraDataReader(
+            EncryptedDataReader encryptedDataReader,
+            ExtraDataConverter extraDataConverter) {
+        this.encryptedDataReader = encryptedDataReader;
         this.extraDataConverter = extraDataConverter;
     }
 
     static ExtraDataReader newInstance() {
         return new ExtraDataReader(
+                new EncryptedDataReader(),
                 ExtraDataConverter.newInstance()
         );
     }
 
-    @Override
     ExtraData read(byte[] encryptedBytes, Key secretKey) throws ProfileException, ExtraDataException {
         ExtraData extraData = null;
         if (encryptedBytes != null && encryptedBytes.length > 0) {
-            byte[] extraDataBytes = decryptBytes(encryptedBytes, secretKey);
+            byte[] extraDataBytes = encryptedDataReader.decryptBytes(encryptedBytes, secretKey);
             extraData = extraDataConverter.read(extraDataBytes);
         } else {
             extraData = new SimpleExtraData();

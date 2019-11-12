@@ -14,11 +14,9 @@ import java.security.Key;
 import static com.yoti.api.client.spi.remote.call.YotiConstants.SYMMETRIC_CIPHER;
 import static javax.crypto.Cipher.DECRYPT_MODE;
 
-public abstract class EncryptedDataReader {
+public class EncryptedDataReader {
 
-    abstract Object read(byte[] encryptedBytes, Key secretKey) throws Exception;
-
-    protected byte[] decryptBytes(byte[] encryptedBytes, Key secretKey) throws ProfileException {
+    public byte[] decryptBytes(byte[] encryptedBytes, Key secretKey) throws ProfileException {
         EncryptedDataProto.EncryptedData encryptedData = parseEncryptedContent(encryptedBytes);
         return decrypt(encryptedData, secretKey);
     }
