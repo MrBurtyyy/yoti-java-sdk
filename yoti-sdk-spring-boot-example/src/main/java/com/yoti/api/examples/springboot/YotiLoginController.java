@@ -51,26 +51,28 @@ public class YotiLoginController extends WebMvcConfigurerAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(YotiLoginController.class);
 
-    static {
-        System.setProperty("yoti.api.url", "https://stg1.api.internal.yoti.com/api/v1");
-    }
-
     private final YotiClient client;
     private final YotiClientProperties properties;
+    private final YotiProperties yotiProperties;
     private final KeyPairSource keyPairSource;
 
-    private final String ATTRIBUTE_API_URL = System.getProperty("yoti.api.url") + "/attribute-registry";
+    private final String ATTRIBUTE_API_URL;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        LOG.info(String.format("Running from %s", System.getProperty("yoti.api.url")));
+        LOG.info(ATTRIBUTE_API_URL);
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     }
 
     @Autowired
-    public YotiLoginController(final YotiClient client, YotiClientProperties properties, KeyPairSource keyPairSource) {
+    public YotiLoginController(final YotiClient client, YotiClientProperties properties, YotiProperties yotiProperties, KeyPairSource keyPairSource) {
         this.client = client;
         this.properties = properties;
+        this.yotiProperties = yotiProperties;
         this.keyPairSource = keyPairSource;
+
+        this.ATTRIBUTE_API_URL = System.getProperty("yoti.api.url") + "/attribute-registry";
     }
 
     @RequestMapping("/")
@@ -109,6 +111,11 @@ public class YotiLoginController extends WebMvcConfigurerAdapter {
         }
 
         model.addAttribute("clientSdkId", properties.getClientSdkId());
+        model.addAttribute("pagetitle", "Step 1: Initial share to issue attribute");
+
+        model.addAttribute("shareSrc", yotiProperties.getBaseUrl() + "/share/client");
+        model.addAttribute("shareApiUrl", yotiProperties.getBaseUrl() + "/share/api/public/qr/");
+        model.addAttribute("shareCdnUrl", yotiProperties.getBaseUrl() + "/share/static");
 
         return "dynamic-share";
     }
@@ -118,62 +125,63 @@ public class YotiLoginController extends WebMvcConfigurerAdapter {
      * We will pass you a token inside url query string (/login?token=token-value)
      */
     @RequestMapping("/issue")
-    public String issueAttributeAndGetInShare(@RequestParam("token") final String token, final Model model) throws Exception {
-        ActivityDetails activityDetails;
-        HumanProfile humanProfile;
+    public String issueAttributeAndGetInShare(@RequestParam(value = "token", required = false) final String token, final Model model) throws Exception {
+        if (token != null && !token.isEmpty()) {
+            ActivityDetails activityDetails;
+            HumanProfile humanProfile;
 
-        try {
-            activityDetails = client.getActivityDetails(token);
-            humanProfile = activityDetails.getUserProfile();
-        } catch (final ProfileException profileException) {
-            LOG.info("Could not get profile", profileException);
-            model.addAttribute("error", profileException.getMessage());
-            return "error";
-        }
+            try {
+                activityDetails = client.getActivityDetails(token);
+                humanProfile = activityDetails.getUserProfile();
+            } catch (final ProfileException profileException) {
+                LOG.info("Could not get profile", profileException);
+                model.addAttribute("error", profileException.getMessage());
+                return "error";
+            }
 
-        ExtraData extraData = activityDetails.getExtraData();
-        AttributeIssuanceDetails attributeIssuanceDetails = extraData.getAttributeIssuanceDetails();
+            ExtraData extraData = activityDetails.getExtraData();
+            AttributeIssuanceDetails attributeIssuanceDetails = extraData.getAttributeIssuanceDetails();
 
-        String attributeIssuanceDetailsToken = attributeIssuanceDetails.getToken();
-        List<AttributeDefinition> issuingAttributes = attributeIssuanceDetails.getIssuingAttributes();
+            String attributeIssuanceDetailsToken = attributeIssuanceDetails.getToken();
+            List<AttributeDefinition> issuingAttributes = attributeIssuanceDetails.getIssuingAttributes();
 
-        List<IssuingAttribute> attributesToIssue = new ArrayList<>();
-        for (AttributeDefinition attrDef : issuingAttributes) {
-            IssuingAttribute issuingAttribute = new IssuingAttribute(attrDef, "some-value");
-            attributesToIssue.add(issuingAttribute);
-        }
+            List<IssuingAttribute> attributesToIssue = new ArrayList<>();
+            for (AttributeDefinition attrDef : issuingAttributes) {
+                IssuingAttribute issuingAttribute = new IssuingAttribute(attrDef, UUID.randomUUID().toString());
+                attributesToIssue.add(issuingAttribute);
+            }
 
-        ThirdPartyAttributeIssuingPayload thirdPartyAttributeIssuingPayload = new ThirdPartyAttributeIssuingPayload(
-                attributeIssuanceDetailsToken,
-                attributesToIssue
-        );
+            ThirdPartyAttributeIssuingPayload thirdPartyAttributeIssuingPayload = new ThirdPartyAttributeIssuingPayload(
+                    attributeIssuanceDetailsToken,
+                    attributesToIssue
+            );
 
-        ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-        byte[] payload = objectMapper.writeValueAsString(thirdPartyAttributeIssuingPayload).getBytes();
+            byte[] payload = objectMapper.writeValueAsString(thirdPartyAttributeIssuingPayload).getBytes();
 
-        SignedRequest signedRequest = SignedRequestBuilder.newInstance()
-                .withKeyPair(keyPairSource.getFromStream(new KeyStreamVisitor()))
-                .withBaseUrl(ATTRIBUTE_API_URL)
-                .withEndpoint("/attributes")
-                .withHttpMethod(HttpMethod.HTTP_POST)
-                .withHeader("X-Yoti-Auth-Id", this.properties.getClientSdkId())
-                .withPayload(payload)
-                .build();
+            SignedRequest signedRequest = SignedRequestBuilder.newInstance()
+                    .withKeyPair(keyPairSource.getFromStream(new KeyStreamVisitor()))
+                    .withBaseUrl(ATTRIBUTE_API_URL)
+                    .withEndpoint("/attributes")
+                    .withHttpMethod(HttpMethod.HTTP_POST)
+                    .withHeader("X-Yoti-Auth-Id", this.properties.getClientSdkId())
+                    .withPayload(payload)
+                    .build();
 
-        /**
-         * Do request to /attribute here
-         */
-        try {
-            LOG.info("Issuing attribute to user");
-            signedRequest.execute(null);
-        } catch (IllegalArgumentException ex) {
-            // This is ok for now
+            /**
+             * Do request to /attribute here
+             */
+            try {
+                LOG.info("Issuing attribute to user");
+                signedRequest.execute(null);
+            } catch (IllegalArgumentException ex) {
+                // This is ok for now
+            }
         }
 
         WantedAttribute wantedThirdPartyAttribute = WantedAttributeBuilder.newInstance()
                 .withName("com.rakuten.id")
-                .withAcceptSelfAsserted(true)
                 .build();
 
         DynamicPolicy dynamicPolicy = new SimpleDynamicPolicyBuilder()
@@ -194,6 +202,11 @@ public class YotiLoginController extends WebMvcConfigurerAdapter {
         }
 
         model.addAttribute("clientSdkId", properties.getClientSdkId());
+        model.addAttribute("pagetitle", "Step 2: Second share to retrieve issued attribute");
+
+        model.addAttribute("shareSrc", yotiProperties.getBaseUrl() + "/share/client");
+        model.addAttribute("shareApiUrl", yotiProperties.getBaseUrl() + "/share/api/public/qr/");
+        model.addAttribute("shareCdnUrl", yotiProperties.getBaseUrl() + "/share/static");
 
         return "dynamic-share";
     }

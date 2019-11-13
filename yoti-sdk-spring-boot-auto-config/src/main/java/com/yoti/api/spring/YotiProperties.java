@@ -2,82 +2,38 @@ package com.yoti.api.spring;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import javax.annotation.PostConstruct;
+
 /**
  * Allows properties for Yoti configuration to be supplied via spring properties (e.g. YAML or properties file).
  */
 @ConfigurationProperties(prefix = "com.yoti")
 public class YotiProperties {
 
-    /**
-     * The Yoti Hub Application ID.
-     */
-    private String applicationId;
+    private String baseUrl;
 
-    /**
-     * The Yoti Hub Scenario ID.
-     */
-    private String scenarioId;
+    private String yotiApiUrl;
 
-    /**
-     * Gets the Yoti Hub Application ID.
-     *
-     * @return the Application ID.
-     */
-    public String getApplicationId() {
-        return applicationId;
+    public String getBaseUrl() {
+        return baseUrl;
     }
 
-    /**
-     * Sets the Yoti Hub Application ID.
-     *
-     * @param applicationId the new Application ID.
-     */
-    public void setApplicationId(final String applicationId) {
-        this.applicationId = applicationId;
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
-    /**
-     * Gets the Yoti Hub Scenario ID.
-     *
-     * @return the scenario ID.
-     */
-    public String getScenarioId() {
-        return scenarioId;
+    public String getYotiApiUrl() {
+        return yotiApiUrl;
     }
 
-    /**
-     * Sets the scenario ID given to you by Yoti Hub.
-     *
-     * @param scenarioId the scenario ID.
-     */
-    public void setScenarioId(final String scenarioId) {
-        this.scenarioId = scenarioId;
+    public void setYotiApiUrl(String yotiApiUrl) {
+        this.yotiApiUrl = yotiApiUrl;
     }
 
-    @Override
-    public String toString() {
-        return "YotiProperties{" +
-                "applicationId='" + applicationId + '\'' +
-                ", scenarioId='" + scenarioId + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        final YotiProperties that = (YotiProperties) o;
-
-        if (applicationId != null ? !applicationId.equals(that.applicationId) : that.applicationId != null)
-            return false;
-        return scenarioId != null ? scenarioId.equals(that.scenarioId) : that.scenarioId == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = applicationId != null ? applicationId.hashCode() : 0;
-        result = 31 * result + (scenarioId != null ? scenarioId.hashCode() : 0);
-        return result;
+    @PostConstruct
+    public void init() {
+        if (yotiApiUrl != null) {
+            System.setProperty("yoti.api.url", yotiApiUrl);
+        }
     }
 }

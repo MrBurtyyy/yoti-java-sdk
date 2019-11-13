@@ -29,6 +29,9 @@ public class YotiClientAutoConfiguration {
     private YotiClientProperties properties;
 
     @Autowired
+    private YotiProperties yotiProperties;
+
+    @Autowired
     private ResourceLoader resourceLoader;
 
     /**
