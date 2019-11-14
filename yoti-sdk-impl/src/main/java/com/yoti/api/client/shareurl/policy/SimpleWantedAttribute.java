@@ -21,15 +21,13 @@ class SimpleWantedAttribute implements WantedAttribute {
     @JsonProperty("optional")
     private final boolean optional;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("accept_self_asserted")
-    private final Boolean acceptSelfAsserted;
+    private final boolean acceptSelfAsserted;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty("constraints")
     private final List<Constraint> constraints;
 
-    SimpleWantedAttribute(String name, String derivation, boolean optional, Boolean acceptSelfAsserted, List<Constraint> constraints) {
+    SimpleWantedAttribute(String name, String derivation, boolean optional, boolean acceptSelfAsserted, List<Constraint> constraints) {
         this.name = name;
         this.derivation = derivation;
         this.optional = optional;
@@ -70,7 +68,7 @@ class SimpleWantedAttribute implements WantedAttribute {
      * @see WantedAttribute#getAcceptSelfAsserted()
      */
     @Override
-    public Boolean getAcceptSelfAsserted() {
+    public boolean getAcceptSelfAsserted() {
         return acceptSelfAsserted;
     }
 
