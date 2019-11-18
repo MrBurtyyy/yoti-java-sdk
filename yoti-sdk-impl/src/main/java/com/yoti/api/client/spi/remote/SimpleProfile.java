@@ -40,10 +40,9 @@ final class SimpleProfile implements Profile {
     @Override
     public Attribute getAttribute(String name) {
         ensureName(name);
-        for (Map.Entry<String, List<Attribute<?>>> entry : protectedAttributes.entrySet()) {
-            if (entry.getKey().equals(name)) {
-                return entry.getValue().get(0);
-            }
+        List<Attribute<?>> attributes = protectedAttributes.get(name);
+        if (attributes != null && attributes.size() > 0) {
+            return attributes.get(0);
         }
         return null;
     }
